@@ -1,2 +1,2 @@
 # freetel-usage-charge
-Get traffic usage and charge from freetel.jp website
+Get traffic usage and charge from personal page on freetel.jp website

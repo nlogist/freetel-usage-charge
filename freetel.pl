@@ -22,11 +22,11 @@ $mech->submit_form(
 );
 
 my $scraper1 = scraper {
-    process 'h2', 'phone[]' => 'TEXT';
-    process 'dl > dt > span', 'usage[]' => 'TEXT';
+    process '//div[contains(@class, "sim-usage")]/h2[contains(@class, "lite")]', 'phone[]' => 'TEXT';
+    process '//div[contains(@class, "sim-usage")]/div[contains(@class, "row")][2]/div[contains(@class, "col-xs-12")][2]/span[1]', 'usage[]' => 'TEXT';
 };
 my $scraper2 = scraper {
-    process 'div > div.col-xs-6.col-sm-3.align-right > span:nth-child(1)', 'charge[]' => 'TEXT';
+    process '//div[contains(@class, "row row-extension va-middle")]/div[contains(@class, "col-xs-6 col-sm-3 align-right")]/span[1]', 'charge[]' => 'TEXT';
 };
 $mech->get('https://mypage.freetel.jp/SavingMode') or die;
 my $result1 = $scraper1->scrape($mech->content);
@@ -34,7 +34,7 @@ $mech->get('https://mypage.freetel.jp/Specification/thisMonth/' . $dt->strftime(
 my $result2 = $scraper2->scrape($mech->content);
 
 for (my $i = 0; $i <= $#{$result1->{phone}}; $i++) {
-    ${$result1->{usage}}[$i * 2] =~ /(\S+)B/;
+    ${$result1->{usage}}[$i] =~ /(\S+)B$/;
     my $usage = int(unformat_number($1, base => 1024));
     my $charge = defined(${$result2->{charge}}[$i]) ? unformat_number(${$result2->{charge}}[$i]) : 0;
     print $$, ":", $dt->strftime('%Y%m%d:%H%M%S.%3N'), "\t", ${$result1->{phone}}[$i], "\t", $usage, "\t", $charge, "\n";
